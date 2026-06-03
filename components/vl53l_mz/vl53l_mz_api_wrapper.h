@@ -31,12 +31,12 @@ class VL53LMZApiWrapper {
   virtual uint8_t init();
   virtual uint8_t check_data_ready(uint8_t *p_is_ready);
   virtual uint8_t get_ranging_data();
-  virtual uint8_t set_resolution(uint8_t resolution);
+  virtual uint8_t set_resolution(VL53LMZResolution resolution);
   virtual uint8_t set_ranging_frequency_hz(uint8_t frequency_hz);
-  virtual uint8_t set_ranging_mode(uint8_t ranging_mode);
+  virtual uint8_t set_ranging_mode(VL53LMZMode mode);
   virtual uint8_t set_integration_time_ms(uint32_t integration_time_ms);
   virtual uint8_t set_sharpener_percent(uint8_t sharpener_percent);
-  virtual uint8_t set_target_order(uint8_t target_order) ;
+  virtual uint8_t set_target_order(VL53LMZTargetOrder target_order) ;
   virtual uint8_t set_vhv_repeat_count(uint32_t repeat_count);
   virtual uint8_t set_power_mode_wakeup();
   virtual uint8_t set_power_mode_sleep();
@@ -44,15 +44,9 @@ class VL53LMZApiWrapper {
   virtual uint8_t stop_ranging();
 #if defined(VL53L_MZ_RUN_XTALK_CALIBRATION) || defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
   virtual uint8_t calibrate_xtalk(uint16_t reflectance_percent, uint8_t nb_samples, uint16_t distance_mm);
-  virtual uint8_t get_caldata_xtalk(uint8_t *p_xtalk_data);
-  virtual uint8_t set_caldata_xtalk(uint8_t *p_xtalk_data);
-  virtual uint8_t *get_xtalk_buffer();
-  virtual uint16_t get_xtalk_buffer_size();
+  virtual uint8_t set_caldata_xtalk(const char *xtalk_data);
 #endif
   virtual uint8_t get_default_i2c_address();
-  virtual uint8_t to_api_resolution(VL53LMZResolution resolution);
-  virtual uint8_t to_api_ranging_mode(VL53LMZMode mode);
-  virtual uint8_t to_api_target_order(VL53LMZTargetOrder target_order);
   VL53LMZ_ResultsData *get_results() {
     return &results_;
   }

@@ -165,33 +165,17 @@ void VL53LMZ::setup() {
     fail_("Xtalk calibration failed: 0x%02X", status);
     return;
   }
-
-  status = this->api_->get_caldata_xtalk(this->api_->get_xtalk_buffer());
+//#elif defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
+  ESP_LOGD(TAG, "Writing xtalk config.");
+  status = this->api_->set_caldata_xtalk(this->xtalk_calibration_data_);
   if (status) {
-    fail_("Getting xtalk calibration data failed: 0x%02X", status);
+    fail_("Setting xtalk calibration data failed: 0x%02X", status);
     return;
-  }
-  ESP_LOGI(TAG, "Xtalk calibration data: %s", base64_encode(this->api_->get_xtalk_buffer(), this->api_->get_xtalk_buffer_size()).c_str());
-#elif defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
-  if (this->xtalk_calibration_data_ != nullptr) {
-    ESP_LOGD(TAG, "Writing xtalk config.");
-    size_t data_length = strlen(this->xtalk_calibration_data_);
-    size_t decoded = base64_decode(reinterpret_cast<const uint8_t *>(this->xtalk_calibration_data_), data_length,
-                                   this->api_->get_xtalk_buffer(), this->api_->get_xtalk_buffer_size());
-    if (decoded < this->api_->get_xtalk_buffer_size()) {
-      fail_("Xtalk calibration data to short: 0x%02X", 255);
-      return;
-    }
-    status = this->api_->set_caldata_xtalk(this->api_->get_xtalk_buffer());
-    if (status) {
-      fail_("Setting xtalk calibration data failed: 0x%02X", status);
-      return;
-    }
   }
 #endif
 
   ESP_LOGD(TAG, "Setting resolution.");
-  status = this->api_->set_resolution(this->api_->to_api_resolution(this->resolution_));
+  status = this->api_->set_resolution(this->resolution_);
   if (status) {
     fail_("Failed to set resolution: 0x%02X", status);
     return;
@@ -205,7 +189,7 @@ void VL53LMZ::setup() {
   }
 
   ESP_LOGD(TAG, "Setting ranging mode.");
-  this->api_->set_ranging_mode(this->api_->to_api_ranging_mode(this->ranging_mode_));
+  this->api_->set_ranging_mode(this->ranging_mode_);
   if (status) {
     fail_("Failed to set ranging mode: 0x%02X", status);
     return;
@@ -226,7 +210,7 @@ void VL53LMZ::setup() {
   }
 
   ESP_LOGD(TAG, "Setting target order.");
-  this->api_->set_target_order(this->api_->to_api_target_order(this->target_order_));
+  this->api_->set_target_order(this->target_order_);
   if (status) {
     fail_("Failed to set target order: 0x%02X", status);
     return;

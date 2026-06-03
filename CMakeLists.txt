@@ -90,6 +90,7 @@ target_include_directories(vl53l_mz
         ${ESPHOME_ROOT}
         # Resolves VL53L5CX_ULD_API headers
         ${CMAKE_CURRENT_SOURCE_DIR}/.libraries/VL53L5CX_ULD_API/inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/.libraries/VL53L7CX_ULD_API/inc
         ${CMAKE_CURRENT_SOURCE_DIR}/.libraries/VL53L8CX_ULD_API/inc
         ${CMAKE_CURRENT_SOURCE_DIR}/.libraries/VL53L_ULD_API_platform/inc
         # Resolves local headers in the root component dir

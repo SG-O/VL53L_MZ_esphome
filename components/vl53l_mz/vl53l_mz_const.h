@@ -2,8 +2,6 @@
 
 namespace esphome::vl53l_mz {
 
-#define VL53LMZ_INVALID_OPTION 255
-
 typedef struct
 {
   uint16_t total;

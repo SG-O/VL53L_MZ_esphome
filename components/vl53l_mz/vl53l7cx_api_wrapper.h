@@ -12,7 +12,7 @@
 namespace esphome::vl53l_mz {
 
 #if defined(VL53L_MZ_RUN_XTALK_CALIBRATION) || defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
-static uint8_t vl53l7cx_xtalk_buffer[VL53L7CX_XTALK_BUFFER_SIZE];
+static uint8_t VL53L7CX_XTALK_BUFFER[VL53L7CX_XTALK_BUFFER_SIZE] = {}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 #endif
 
 class VL53L7CXApiWrapper : public VL53LMZApiWrapper{
@@ -46,18 +46,28 @@ public:
     return status;
   }
 
-  uint8_t set_resolution(const uint8_t resolution) override {
-    if (resolution == VL53LMZ_INVALID_OPTION) return VL53L7CX_STATUS_ERROR;
-    return vl53l7cx_set_resolution(&this->config_, resolution);
+  uint8_t set_resolution(const VL53LMZResolution resolution) override {
+    if (resolution == VL53LMZ_4X4) {
+      return vl53l7cx_set_resolution(&this->config_, VL53L7CX_RESOLUTION_4X4);
+    } 
+    if (resolution == VL53LMZ_8X8) {
+      return vl53l7cx_set_resolution(&this->config_, VL53L7CX_RESOLUTION_8X8);
+    }
+      return VL53L7CX_STATUS_INVALID_PARAM;
   }
 
   uint8_t set_ranging_frequency_hz(const uint8_t frequency_hz) override {
     return vl53l7cx_set_ranging_frequency_hz(&this->config_, frequency_hz);
   }
 
-  uint8_t set_ranging_mode(const uint8_t ranging_mode) override {
-    if (ranging_mode == VL53LMZ_INVALID_OPTION) return VL53L7CX_STATUS_ERROR;
-    return vl53l7cx_set_ranging_mode(&this->config_, ranging_mode);
+  uint8_t set_ranging_mode(const VL53LMZMode mode) override {
+    if (mode == VL53LMZ_AUTO) {
+      return vl53l7cx_set_ranging_mode(&this->config_, VL53L7CX_RANGING_MODE_AUTONOMOUS);
+    } 
+    if (mode == VL53LMZ_CONTINUOUS) {
+      return vl53l7cx_set_ranging_mode(&this->config_, VL53L7CX_RANGING_MODE_CONTINUOUS);
+    } 
+    return VL53L7CX_STATUS_INVALID_PARAM;    
   }
 
   uint8_t set_integration_time_ms(const uint32_t integration_time_ms) override {
@@ -68,9 +78,14 @@ public:
     return vl53l7cx_set_sharpener_percent(&this->config_, sharpener_percent);
   }
 
-  uint8_t set_target_order(const uint8_t target_order) override {
-    if (target_order == VL53LMZ_INVALID_OPTION) return VL53L7CX_STATUS_ERROR;
-    return vl53l7cx_set_target_order(&this->config_, target_order);
+  uint8_t set_target_order(const VL53LMZTargetOrder target_order) override {
+    if (target_order == VL53LMZ_STRONGEST) {
+      return vl53l7cx_set_target_order(&this->config_, VL53L7CX_TARGET_ORDER_STRONGEST);
+    } 
+    if (target_order == VL53LMZ_CLOSEST) {
+      return vl53l7cx_set_target_order(&this->config_, VL53L7CX_TARGET_ORDER_CLOSEST);
+    }
+    return VL53L7CX_STATUS_INVALID_PARAM;    
   }
 
   uint8_t set_vhv_repeat_count(const uint32_t repeat_count) override {
@@ -91,50 +106,34 @@ public:
 
 #if defined(VL53L_MZ_RUN_XTALK_CALIBRATION) || defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
   uint8_t calibrate_xtalk(uint16_t reflectance_percent, uint8_t nb_samples, uint16_t distance_mm) override {
-    return vl53l7cx_calibrate_xtalk(&this->config_, reflectance_percent, nb_samples, distance_mm);
+    uint8_t status = vl53l7cx_calibrate_xtalk(&this->config_, reflectance_percent, nb_samples, distance_mm);
+    if (status) {
+      return status;
+    }
+    status = vl53l7cx_get_caldata_xtalk(&this->config_, VL53L7CX_XTALK_BUFFER);
+    if (status) {
+      return status;
+    }
+    ESP_LOGI(WRAPPER_TAG, "Xtalk calibration data: %s", base64_encode(VL53L7CX_XTALK_BUFFER, VL53L7CX_XTALK_BUFFER_SIZE).c_str());
+    return status;
   }
 
-  uint8_t get_caldata_xtalk(uint8_t *p_xtalk_data) override { return vl53l7cx_get_caldata_xtalk(&this->config_, p_xtalk_data); }
-
-  uint8_t set_caldata_xtalk(uint8_t *p_xtalk_data) override { return vl53l7cx_set_caldata_xtalk(&this->config_, p_xtalk_data); }
-
-  uint8_t *get_xtalk_buffer() override { return vl53l7cx_xtalk_buffer; }
-
-  uint16_t get_xtalk_buffer_size() {return VL53L7CX_XTALK_BUFFER_SIZE; }
+  uint8_t set_caldata_xtalk(const char *xtalk_data) override {
+    if (xtalk_data == nullptr) {
+      return VL53L7CX_STATUS_INVALID_PARAM;
+    }
+    const size_t data_length = strlen(xtalk_data);
+    const size_t decoded = base64_decode(reinterpret_cast<const uint8_t *>(xtalk_data), data_length,
+                                   VL53L7CX_XTALK_BUFFER, VL53L7CX_XTALK_BUFFER_SIZE);
+    if (decoded < VL53L7CX_XTALK_BUFFER_SIZE) {
+      return VL53L7CX_STATUS_INVALID_PARAM;
+    }
+    return vl53l7cx_set_caldata_xtalk(&this->config_, VL53L7CX_XTALK_BUFFER);
+  }
 #endif
 
-  uint8_t get_default_i2c_address() {
+  uint8_t get_default_i2c_address() override {
     return VL53L7CX_DEFAULT_I2C_ADDRESS >> 1;
-  }
-
-  uint8_t to_api_resolution(VL53LMZResolution resolution) {
-    if (resolution == VL53LMZ_4X4) {
-      return VL53L7CX_RESOLUTION_4X4;
-    } else if (resolution == VL53LMZ_8X8) {
-      return VL53L7CX_RESOLUTION_8X8;
-    } else {
-      return VL53LMZ_INVALID_OPTION;
-    }
-  }
-
-  virtual uint8_t to_api_ranging_mode(VL53LMZMode mode) {
-    if (mode == VL53LMZ_AUTO) {
-      return VL53L7CX_RANGING_MODE_AUTONOMOUS;
-    } else if (mode == VL53LMZ_CONTINUOUS) {
-      return VL53L7CX_RANGING_MODE_CONTINUOUS;
-    } else {
-      return VL53LMZ_INVALID_OPTION;
-    }
-  }
-
-  virtual uint8_t to_api_target_order(VL53LMZTargetOrder target_order) {
-    if (target_order == VL53LMZ_STRONGEST) {
-      return VL53L7CX_TARGET_ORDER_STRONGEST;
-    } else if (target_order == VL53LMZ_CLOSEST) {
-      return VL53L7CX_TARGET_ORDER_CLOSEST;
-    } else {
-      return VL53LMZ_INVALID_OPTION;
-    }
   }
 
 protected:
