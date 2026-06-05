@@ -152,7 +152,7 @@ void VL53LMZ::setup() {
     fail_("Xtalk calibration failed: 0x%02X", status);
     return;
   }
-//#elif defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
+#elif defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
   ESP_LOGD(TAG, "Writing xtalk config.");
   if (this->xtalk_calibration_data_ != nullptr) {
     status = this->api_->set_caldata_xtalk(this->xtalk_calibration_data_);
