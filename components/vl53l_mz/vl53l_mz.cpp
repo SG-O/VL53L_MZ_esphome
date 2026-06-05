@@ -111,22 +111,16 @@ void VL53LMZ::setup() {
     ESP_LOGD(TAG, "Initializing I2C address.");
     // Pull the lp pin high (enable device)
     this->lp_pin_->digital_write(true);
-    delayMicroseconds(100);
+    delayMicroseconds(1000);
     this->hw_reset_();
     status = this->api_->is_alive(&is_alive);
     if (!is_alive) {
-      ESP_LOGD(TAG, "Switching device address to: 0x%02X", this->address_);
-      // Use the default address to set the wanted address to use before
-      // switching back.
-      const uint8_t final_address = this->address_;
-      this->set_i2c_address(api_->get_default_i2c_address());
-
-      status = this->api_->set_i2c_address(final_address << 1);
+      ESP_LOGD(TAG, "Switching device address to: 0x%02X", this->get_i2c_address());
+      status = this->api_->set_i2c_address(this->get_i2c_address());
       if (status) {
         fail_("Failed to set I2C address: 0x%02X", status);
         return;
       }
-      this->set_i2c_address(final_address);
     }
   } else {
     this->hw_reset_();
@@ -150,13 +144,6 @@ void VL53LMZ::setup() {
     return;
   }
 
-  ESP_LOGD(TAG, "Checking readiness.");
-  status = this->api_->check_data_ready(&this->is_ready_);
-  if (status) {
-    fail_("Failed to check readiness: 0x%02X", status);
-    return;
-  }
-
 #if defined(VL53L_MZ_RUN_XTALK_CALIBRATION)
   ESP_LOGD(TAG, "Calibrating xtalk.");
   status = this->api_->calibrate_xtalk(this->xtalk_calibration_reflectance_, 16,
@@ -167,10 +154,12 @@ void VL53LMZ::setup() {
   }
 //#elif defined(VL53L_MZ_SET_XTALK_CALIBRATION_DATA)
   ESP_LOGD(TAG, "Writing xtalk config.");
-  status = this->api_->set_caldata_xtalk(this->xtalk_calibration_data_);
-  if (status) {
-    fail_("Setting xtalk calibration data failed: 0x%02X", status);
-    return;
+  if (this->xtalk_calibration_data_ != nullptr) {
+    status = this->api_->set_caldata_xtalk(this->xtalk_calibration_data_);
+    if (status) {
+      fail_("Setting xtalk calibration data failed: 0x%02X", status);
+      return;
+    }
   }
 #endif
 

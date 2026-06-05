@@ -32,7 +32,6 @@ FetchContent_Declare(
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
-FetchContent_MakeAvailable(VL53L5CX_ULD_API)
 
 FetchContent_Declare(
         "VL53L7CX_ULD_API"
@@ -43,7 +42,6 @@ FetchContent_Declare(
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
-FetchContent_MakeAvailable(VL53L7CX_ULD_API)
 
 FetchContent_Declare(
         "VL53L8CX_ULD_API"
@@ -54,7 +52,6 @@ FetchContent_Declare(
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
-FetchContent_MakeAvailable(VL53L8CX_ULD_API)
 
 FetchContent_Declare(
         "VL53L_ULD_API_platform"
@@ -65,7 +62,7 @@ FetchContent_Declare(
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
 )
-FetchContent_MakeAvailable(VL53L_ULD_API_platform)
+FetchContent_MakeAvailable(VL53L5CX_ULD_API VL53L7CX_ULD_API VL53L8CX_ULD_API VL53L_ULD_API_platform)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

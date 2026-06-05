@@ -28,7 +28,18 @@ public:
 
   uint8_t is_alive(uint8_t *p_is_alive) override { return vl53l7cx_is_alive(&this->config_, p_is_alive); }
 
-  uint8_t set_i2c_address(const uint16_t i2c_address) override { return vl53l7cx_set_i2c_address(&this->config_, i2c_address); }
+  uint8_t set_i2c_address(const uint8_t i2c_address) override {
+    this->i2c_device_->set_i2c_address(VL53L7CX_DEFAULT_I2C_ADDRESS >> 1);
+    uint8_t status = i2c::ErrorCode::ERROR_OK;
+    uint8_t value = 0x00;
+    status |= this->i2c_device_->write_register16(0x7fff, &value, 1);
+    value = i2c_address;
+    status |= this->i2c_device_->write_register16(0x04, &value, 1);
+    this->i2c_device_->set_i2c_address(i2c_address);
+    value = 0x02;
+    status |= this->i2c_device_->write_register16(0x7fff, &value, 1);
+    return status;
+  }
 
   uint8_t init() override { return vl53l7cx_init(&this->config_); }
 
@@ -131,10 +142,6 @@ public:
     return vl53l7cx_set_caldata_xtalk(&this->config_, VL53L7CX_XTALK_BUFFER);
   }
 #endif
-
-  uint8_t get_default_i2c_address() override {
-    return VL53L7CX_DEFAULT_I2C_ADDRESS >> 1;
-  }
 
 protected:
   VL53L7CX_Configuration config_{};

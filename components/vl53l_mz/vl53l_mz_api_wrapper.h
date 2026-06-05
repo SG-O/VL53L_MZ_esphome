@@ -27,7 +27,7 @@ class VL53LMZApiWrapper {
   }
 
   virtual uint8_t is_alive(uint8_t *p_is_alive);
-  virtual uint8_t set_i2c_address(uint16_t i2c_address);
+  virtual uint8_t set_i2c_address(uint8_t i2c_address);
   virtual uint8_t init();
   virtual uint8_t check_data_ready(uint8_t *p_is_ready);
   virtual uint8_t get_ranging_data();
@@ -46,7 +46,6 @@ class VL53LMZApiWrapper {
   virtual uint8_t calibrate_xtalk(uint16_t reflectance_percent, uint8_t nb_samples, uint16_t distance_mm);
   virtual uint8_t set_caldata_xtalk(const char *xtalk_data);
 #endif
-  virtual uint8_t get_default_i2c_address();
   VL53LMZ_ResultsData *get_results() {
     return &results_;
   }

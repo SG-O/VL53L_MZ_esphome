@@ -45,10 +45,13 @@ class VL53LMZ : public PollingComponent, public i2c::I2CDevice {
   void set_target_order(const VL53LMZTargetOrder target_order) { this->target_order_ = target_order; }
   void set_continuous_update(const bool continuous_update) { this->continuous_update_ = continuous_update; }
 #ifdef VL53L_MZ_RUN_XTALK_CALIBRATION
-  void set_xtalk_calibration_reflectance(uint8_t xtalk_calibration_reflectance) {
+  void set_xtalk_run_calibration(const bool xtalk_run_calibration) {
+    this->xtalk_run_calibration_ = xtalk_run_calibration;
+  }
+  void set_xtalk_calibration_reflectance(const uint8_t xtalk_calibration_reflectance) {
     this->xtalk_calibration_reflectance_ = xtalk_calibration_reflectance;
   }
-  void set_xtalk_calibration_distance(uint16_t xtalk_calibration_distance) {
+  void set_xtalk_calibration_distance(const uint16_t xtalk_calibration_distance) {
     this->xtalk_calibration_distance_ = xtalk_calibration_distance;
   }
 #endif
@@ -80,6 +83,7 @@ class VL53LMZ : public PollingComponent, public i2c::I2CDevice {
   VL53LMZTargetOrder target_order_{VL53LMZ_STRONGEST};
   bool continuous_update_{false};
 #ifdef VL53L_MZ_RUN_XTALK_CALIBRATION
+  bool xtalk_run_calibration_{false};
   uint8_t xtalk_calibration_reflectance_{3};
   uint16_t xtalk_calibration_distance_{600};
 #endif

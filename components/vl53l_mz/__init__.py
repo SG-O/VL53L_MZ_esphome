@@ -174,6 +174,7 @@ async def to_code(config):
     cg.add(var.set_continuous_update(config[CONF_CONTINUOUS_UPDATE]))
     if config[CONF_RUN_XTALK_CALIBRATION]:
         cg.add_define("VL53L_MZ_RUN_XTALK_CALIBRATION")
+        cg.add(var.set_xtalk_run_calibration(1))
         cg.add(var.set_xtalk_calibration_reflectance(config[CONF_XTALK_CALIBRATION_REFLECTANCE]))
         cg.add(var.set_xtalk_calibration_distance(int(config[CONF_XTALK_CALIBRATION_DISTANCE] * 1000)))
     if CONF_XTALK_CALIBRATION_DATA in config:
