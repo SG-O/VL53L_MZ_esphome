@@ -44,6 +44,11 @@ sensor:
     zone_mode: SINGLE
     zone_data: TARGET_COUNT
     selected_zone: 0
+  - platform: vl53l_mz
+    vl53l_mz_id: sensor_01
+    name: temperature
+    zone_mode: SINGLE
+    zone_data: TEMPERATURE
 
   # AVERAGE zone_mode with all zone_data values
   - platform: vl53l_mz

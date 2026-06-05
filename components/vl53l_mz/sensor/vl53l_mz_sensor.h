@@ -17,6 +17,7 @@ enum VL53LMZZoneData {
   VL53LMZ_SIGMA,
   VL53LMZ_ZONE_REFLECTANCE,
   VL53LMZ_ZONE_TARGET_COUNT,
+  VL53LMZ_TEMPERATURE,
 };
 
 class VL53LMZSensor : public VL53LMZChild, public sensor::Sensor, public Component {

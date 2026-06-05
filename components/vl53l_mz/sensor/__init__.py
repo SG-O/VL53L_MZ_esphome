@@ -4,12 +4,15 @@ from esphome.components import sensor
 from esphome.const import (
     CONF_ID,
     ICON_ARROW_EXPAND_VERTICAL,
+    ICON_THERMOMETER,
     STATE_CLASS_MEASUREMENT,
     UNIT_METER,
     UNIT_PERCENT,
     UNIT_EMPTY,
+    UNIT_CELSIUS,
     CONF_UNIT_OF_MEASUREMENT,
-    CONF_ACCURACY_DECIMALS
+    CONF_ACCURACY_DECIMALS,
+    CONF_ICON
 )
 from .. import (
     vl53l_mz_ns,
@@ -38,9 +41,16 @@ ZONE_DATA = {
     "SIGMA": VL53LMZZoneData.VL53LMZ_SIGMA,
     "REFLECTANCE": VL53LMZZoneData.VL53LMZ_ZONE_REFLECTANCE,
     "TARGET_COUNT": VL53LMZZoneData.VL53LMZ_ZONE_TARGET_COUNT,
+    "TEMPERATURE": VL53LMZZoneData.VL53LMZ_TEMPERATURE,
 }
 
 CONF_SELECTED_ZONE = "selected_zone"
+
+def check_keys(obj):
+    if obj[CONF_ZONE_DATA] == "TEMPERATURE" and obj[CONF_ZONE_MODE] != "SINGLE" :
+        msg = "Use zone_mode SINGLE when requesting TEMPERATURE data."
+        raise cv.Invalid(msg)
+    return obj
 
 CONFIG_SCHEMA = cv.All(
     sensor.sensor_schema(
@@ -61,7 +71,8 @@ CONFIG_SCHEMA = cv.All(
             ),
             cv.Optional(CONF_SELECTED_ZONE, default=0): cv.int_range(min=0, max=63),
         }
-    )
+    ),
+    check_keys,
 )
 
 
@@ -72,6 +83,10 @@ async def to_code(config):
     if config.get(CONF_ZONE_DATA) == "TARGET_COUNT":
         config[CONF_UNIT_OF_MEASUREMENT] = UNIT_EMPTY
         config[CONF_ACCURACY_DECIMALS] = 0
+    if config.get(CONF_ZONE_DATA) == "TEMPERATURE":
+        config[CONF_UNIT_OF_MEASUREMENT] = UNIT_CELSIUS
+        config[CONF_ACCURACY_DECIMALS] = 0
+        config[CONF_ICON] = ICON_THERMOMETER
     parent = await cg.get_variable(config[CONF_VL53LMZ_ID])
     var = cg.new_Pvariable(config[CONF_ID])
     cg.add(var.set_zone_mode(config[CONF_ZONE_MODE]))

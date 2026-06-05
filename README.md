@@ -154,6 +154,7 @@ sensor:
 | `SIGMA`        | m    | Sigma estimator for noise in the reported distance (3 decimal places). |
 | `REFLECTANCE`  | %    | Estimated target reflectance in percent (0 decimal places).            |
 | `TARGET_COUNT` | -    | Number of detected targets in the zone.                                |
+| `TEMPERATURE`  | °C   | Silicon temperature of the sensor (0 decimal places).                  |
 
 ### Text Sensor (`text_sensor`)
 

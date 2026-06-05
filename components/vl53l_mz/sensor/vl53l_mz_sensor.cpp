@@ -44,6 +44,9 @@ void VL53LMZSensor::dump_config() {
     case VL53LMZ_ZONE_TARGET_COUNT:
       ESP_LOGCONFIG(TAG, "  Zone Data: TARGET COUNT");
       break;
+    case VL53LMZ_TEMPERATURE:
+      ESP_LOGCONFIG(TAG, "  Zone Data: TEMPERATURE");
+      break;
     default:
       ESP_LOGCONFIG(TAG, "  Zone Data: unknown");
   }
@@ -57,6 +60,10 @@ void VL53LMZSensor::on_update(const VL53LMZ_ResultsData *result_data, const VL53
   uint16_t i;
   uint16_t n;
   uint16_t valid;
+  if (this->zone_data_ == VL53LMZ_TEMPERATURE) {
+    this->publish_state(result_data->silicon_temp_degc);
+    return;
+  }
   switch (this->zone_mode_) {
     case VL53LMZ_SINGLE:
       if (this->selected_zone_ >= resolution.total) {

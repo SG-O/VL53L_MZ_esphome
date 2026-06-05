@@ -84,6 +84,11 @@ sensor:
   - platform: vl53l_mz
     name: center_distance
     zone_mode: CENTER
+  - platform: vl53l_mz
+    vl53l_mz_id: sensor_01
+    name: temperature
+    zone_mode: SINGLE
+    zone_data: TEMPERATURE
 
 text_sensor:
   - platform: vl53l_mz
