@@ -8,11 +8,8 @@ Supports the following STMicroelectronics multizone Time-of-Flight (ToF) sensors
 - **VL53L7CX** — 90° diagonal FoV, up to 3.5 m range
 - **VL53L8CX** — 65° diagonal FoV, up to 4 m range, 2nd generation, lower power than VL53L5CX
 
-> **⚠️ Disclaimer:** This software is **experimental**. It has only been tested on the **ESP32-C6** using the **ESP-IDF**
-> framework. The following features are **untested**:
-> - VL53L7CX support
-> - VL53L8CX support
-> - Multiple sensors on the same I²C bus
+> **⚠️ Disclaimer:** This software is **experimental**. It has been tested on the **ESP32-C6** using the **ESP-IDF** and on the **ESP32-S3** using both **ESP-IDF** and **Arduino** frameworks.
+> The following features are **untested**:
 > - Crosstalk (Xtalk) calibration (both running calibration and applying pre-calibrated data)
 
 ## Features
@@ -222,6 +219,10 @@ you must connect the LP pin to a free output of your MCU and specify the `lp_pin
 
 The component handles the address programming sequence automatically: it first sets all LP pins low, then
 brings them high one by one to bring each sensor online, and program the new address.
+
+A complete working example configuration for multiple sensors is available in [`example_multiple.yaml`](example_multiple.yaml).
+
+> **Note:** If a configured sensor is not connected or fails to communicate, the remaining sensors will continue to operate normally.
 
 ```yaml
 vl53l_mz:

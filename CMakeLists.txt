@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-
+set(CMAKE_WARN_UNUSED_CLI OFF)
 #Only used for development
 
 include(FetchContent)
